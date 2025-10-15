@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Food Feedback Form</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #f9f9f9, #e6f7ff);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background: #fff;
+      padding: 30px 40px;
+      border-radius: 15px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      width: 420px;
+      text-align: center;
+    }
+
+    h2 {
+      color: #0078D7;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      text-align: left;
+      margin-top: 12px;
+      font-weight: 500;
+      color: #333;
+    }
+
+    select, input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    select:focus, input[type="text"]:focus {
+      border-color: #0078D7;
+    }
+
+    .menu-box {
+      background: #f0f8ff;
+      padding: 12px;
+      border-radius: 10px;
+      margin-top: 15px;
+      color: #333;
+      font-size: 14px;
+      text-align: left;
+      display: none;
+    }
+
+    .radio-group {
+      text-align: left;
+      margin-top: 8px;
+    }
+
+    .radio-group input {
+      margin-right: 5px;
+    }
+
+    button {
+      background-color: #0078D7;
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      margin-top: 20px;
+      border-radius: 10px;
+      font-size: 15px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background-color: #005fa3;
+      transform: translateY(-1px);
+    }
+
+    .secondary-btn {
+      background-color: #34a853;
+    }
+
+    .secondary-btn:hover {
+      background-color: #2b8a42;
+    }
+
+    .footer-note {
+      font-size: 12px;
+      color: #777;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>🍽️ Student Food Feedback</h2>
+    <form id="feedbackForm">
+      <label>Student ID:</label>
+      <input type="text" id="studentId" required>
+
+      <label>Select Day:</label>
+      <select id="daySelect" required>
+        <option value="">-- Select Day --</option>
+        <option>Monday</option>
+        <option>Tuesday</option>
+        <option>Wednesday</option>
+        <option>Thursday</option>
+        <option>Friday</option>
+        <option>Saturday</option>
+        <option>Sunday</option>
+      </select>
+
+      <label>Select Meal:</label>
+      <select id="mealType" required>
+        <option value="">-- Select Meal --</option>
+        <option>Breakfast</option>
+        <option>Lunch</option>
+        <option>Dinner</option>
+      </select>
+
+      <div id="menuBox" class="menu-box"></div>
+
+      <label>Did you like it?</label>
+      <div class="radio-group">
+        <input type="radio" name="liked" value="1" required> Yes  
+        <input type="radio" name="liked" value="0"> No
+      </div>
+
+      <label>If No, what do you prefer instead?</label>
+      <input type="text" id="suggestion" placeholder="e.g. Paneer Curry">
+
+      <button type="submit">Submit Feedback</button>
+    </form>
+
+    <button class="secondary-btn" onclick="window.location.href='report.html'">📊 View Reports</button>
+
+    <div class="footer-note">
+      © 2025 Student Mess Feedback Portal
+    </div>
+  </div>
+
+  <script>
+    // 🥗 Hostel Menu Data
+    const menu = {
+      Monday: {
+        Breakfast: "Chapathi, Aloo Curry, Chutney",
+        Lunch: "Rice, Dal, Rasam, Curd",
+        Dinner: "Gobi Rice / Tomato Rice, Curd Rice"
+      },
+      Tuesday: {
+        Breakfast: "Uthappam, Chutney",
+        Lunch: "Rice, Dal, Rasam, Curd",
+        Dinner: "Rice, Sambar, Rasam, Veg - Aloo Chips, Non-Veg - Egg"
+      },
+      Wednesday: {
+        Breakfast: "Upma, Chutney",
+        Lunch: "Rice, Dal, Rasam, Curd",
+        Dinner: "Chapathi, Curd Rice, Veg - Chanadal Curry, Non-Veg - Chicken Curry"
+      },
+      Thursday: {
+        Breakfast: "Pongal, Chutney / Uggani, Bajji",
+        Lunch: "Color Rice, Aloo Curry, Raitha",
+        Dinner: "Rice, Dal, Rasam, Curd"
+      },
+      Friday: {
+        Breakfast: "Poori, Aloo Curry, Chutney",
+        Lunch: "Rice, Dal, Rasam, Curd",
+        Dinner: "Veg - Vegetable Rice / Kaju Rice, Non-Veg - Egg Rice"
+      },
+      Saturday: {
+        Breakfast: "Idli, Chutney, Sambar",
+        Lunch: "Sweet, Rice, Dal, Rasam, Curd",
+        Dinner: "Pulihora / Lemon Rice"
+      },
+      Sunday: {
+        Breakfast: "Dosa, Chutney, Aloo Fry",
+        Lunch: "Bagara Rice, Chicken Curry",
+        Dinner: "Rice, Dal, Rasam, Curd"
+      }
+    };
+
+    const daySelect = document.getElementById("daySelect");
+    const mealSelect = document.getElementById("mealType");
+    const menuBox = document.getElementById("menuBox");
+
+    // When user changes day or meal → show menu automatically
+    function updateMenu() {
+      const day = daySelect.value;
+      const meal = mealSelect.value;
+      if (day && meal && menu[day] && menu[day][meal]) {
+        menuBox.style.display = "block";
+        menuBox.innerHTML = `<strong>${meal} Menu:</strong> ${menu[day][meal]}`;
+      } else {
+        menuBox.style.display = "none";
+      }
+    }
+
+    daySelect.addEventListener("change", updateMenu);
+    mealSelect.addEventListener("change", updateMenu);
+
+    // Submit feedback to backend
+    document.getElementById("feedbackForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const data = {
+        student_id: document.getElementById("studentId").value,
+        day: daySelect.value,
+        meal_type: mealSelect.value,
+        liked: document.querySelector("input[name='liked']:checked").value,
+        suggestion: document.getElementById("suggestion").value
+      };
+
+      await fetch("http://localhost:3000/submit-feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+
+      alert("✅ Feedback submitted successfully!");
+      document.getElementById("feedbackForm").reset();
+      menuBox.style.display = "none";
+    });
+  </script>
+</body>
+</html>
